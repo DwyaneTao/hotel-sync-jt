@@ -2,9 +2,7 @@ package com.fangcang.hotel.sync.data.web.jt;
 
 import com.alibaba.fastjson.JSON;
 import com.fangcang.hotel.sync.common.api.dto.mapping.HotelMappingDto;
-import com.fangcang.hotel.sync.common.api.dto.order.SupplyOrderDto;
 import com.fangcang.hotel.sync.data.dto.MsgResponse;
-import com.fangcang.hotel.sync.data.dto.SupplierOrderResult;
 import com.fangcang.hotel.sync.data.service.SupplyFetchService;
 import com.fangcang.hotel.sync.data.util.StringUtilExtend;
 import com.fangcang.hotel.sync.jt.api.request.*;
@@ -13,7 +11,6 @@ import com.fangcang.hotel.sync.jt.dto.JTProductDataRequest;
 import com.fangcang.hotel.sync.jt.service.JTExtendsConfigService;
 import com.fangcang.hotel.sync.jt.service.JTHotelSyncService;
 import com.fangcang.hotel.sync.jt.service.impl.JTInitMappingService;
-import com.fangcang.hotel.sync.jt.service.impl.JTOrderService;
 import com.fangcang.util.StringUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;

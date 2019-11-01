@@ -23,6 +23,16 @@ public class CancelFitReserveRequest extends BusinessRequest{
     /**
      * 操作员名称
      */
+    private String userName;
+
+    public String getUserName() {
+        return userName;
+    }
+
+    public void setUserName(String userName) {
+        this.userName = userName;
+    }
+
     public String getSerial() {
         return serial;
     }

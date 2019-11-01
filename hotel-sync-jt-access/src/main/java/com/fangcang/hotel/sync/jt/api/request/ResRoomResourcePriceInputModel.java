@@ -5,12 +5,12 @@ import java.math.BigDecimal;
 public class ResRoomResourcePriceInputModel extends  BusinessRequest {
 
     /**
-     * 中央订单号
+     * 中央订单号（可选择的）
      */
     private String serial;
 
     /**
-     * 酒店订单号
+     * 酒店订单号（可选择的）
      */
     private String accountNo;
 
@@ -22,7 +22,7 @@ public class ResRoomResourcePriceInputModel extends  BusinessRequest {
     /**
      * 房类
      */
-    private String roomTyper;
+    private String roomType;
 
     /**
      * 房价码
@@ -34,12 +34,12 @@ public class ResRoomResourcePriceInputModel extends  BusinessRequest {
     private BigDecimal roomRate;
 
     /**
-     * 促销价
+     * 促销价（可选择的）
      */
     private BigDecimal promotionPricel;
 
     /**
-     * 指导价
+     * 指导价（可选择的）
      */
     private BigDecimal guidePrice;
 
@@ -49,19 +49,65 @@ public class ResRoomResourcePriceInputModel extends  BusinessRequest {
     private BigDecimal actualRate;
 
     /**
-     *优惠金额
+     * 优惠金额（可选择的）
      */
     private BigDecimal couponsAmount;
 
     /**
-     * 变价理由
+     * 变价理由（可选择的）
      */
     private String reasion;
 
     /**
-     * 备注
+     * 备注（可选择的）
      */
     private String remarks;
+
+    /**
+     * 集团编号
+     * @return
+     */
+    private String groupCode;
+
+    /**
+     * 酒店编号
+     * @return
+     */
+    private String hotelCode;
+
+    /**
+     * 操作员名称
+     * @return
+     */
+    private String userName;
+
+    /**
+     * 金额
+     * @return
+     */
+    private BigDecimal roomPrice;
+
+    /**
+     *
+     * @return
+     */
+    private String actualRateText;
+
+    public String getActualRateText() {
+        return actualRateText;
+    }
+
+    public void setActualRateText(String actualRateText) {
+        this.actualRateText = actualRateText;
+    }
+
+    public BigDecimal getRoomPrice() {
+        return roomPrice;
+    }
+
+    public void setRoomPrice(BigDecimal roomPrice) {
+        this.roomPrice = roomPrice;
+    }
 
     public String getSerial() {
         return serial;
@@ -87,12 +133,12 @@ public class ResRoomResourcePriceInputModel extends  BusinessRequest {
         this.businessDate = businessDate;
     }
 
-    public String getRoomTyper() {
-        return roomTyper;
+    public String getRoomType() {
+        return roomType;
     }
 
-    public void setRoomTyper(String roomTyper) {
-        this.roomTyper = roomTyper;
+    public void setRoomType(String roomType) {
+        this.roomType = roomType;
     }
 
     public String getRateCode() {
@@ -158,4 +204,29 @@ public class ResRoomResourcePriceInputModel extends  BusinessRequest {
     public void setRemarks(String remarks) {
         this.remarks = remarks;
     }
+
+    public String getGroupCode() {
+        return groupCode;
+    }
+
+    public void setGroupCode(String groupCode) {
+        this.groupCode = groupCode;
+    }
+
+    public String getHotelCode() {
+        return hotelCode;
+    }
+
+    public void setHotelCode(String hotelCode) {
+        this.hotelCode = hotelCode;
+    }
+
+    public String getUserName() {
+        return userName;
+    }
+
+    public void setUserName(String userName) {
+        this.userName = userName;
+    }
+
 }
