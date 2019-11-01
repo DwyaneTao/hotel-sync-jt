@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:p="http://www.springframework.org/schema/p"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xsi:schemaLocation="
+        http://www.springframework.org/schema/beans 
+        http://www.springframework.org/schema/beans/spring-beans.xsd
+        http://www.springframework.org/schema/context 
+        http://www.springframework.org/schema/context/spring-context.xsd
+        http://www.springframework.org/schema/aop
+        http://www.springframework.org/schema/aop/spring-aop.xsd"
+	default-autowire="byName" default-lazy-init="false">
+
+	<!-- 云配置服务 -->
+	<!-- 项目已经配置，无需再配置 -->
+	<!-- <context:component-scan base-package="com.baidu,com.fangcang.hotel.sync.config" 
+		/> -->
+	<!-- <aop:aspectj-autoproxy proxy-target-class="true"></aop:aspectj-autoproxy> -->
+
+	<!-- 1.DisconfMgrBean的扫描主要是静态数据的初始化，并未涉及到动态数据 -->
+	<!-- 应用程序启动时，当Spring容器扫描了所有Java Bean却还未初始化这些Bean时，disconf-client 模块会优先开始初始化（最高优先级）。 
+		它会将 配置文件名、配置项名记录在配置仓库里，并去 disconf-web 平台下载配置文件至classpath目录下。 并且，还会到ZK上生成相应的结点。 -->
+	<!-- 接着Spring开始初始化用户定义的SpringBean。由于配置文件已经被正确下载至Classpath路径下，因此，JavaBean的配置文件使用的是分布式配置文件，而非本地的配置文件。 -->
+	<bean id="disconfMgrBean" class="com.baidu.disconf.client.DisconfMgrBean" depends-on="propertyPlaceholderConfigurer"
+		destroy-method="destroy">
+		<property name="scanPackage" value="com.fangcang.hotel.sync" />
+	</bean>
+
+	<!-- 2.将一些动态的数据写到仓库里 -->
+	<!-- 待SpringBean初始化后，Disconf-client会获取配置更新回调类实例： -->
+	<!-- 此时，Spring上的所有Bean均已被init。Disconf-client模块会再次运行，这时它会去获取用户撰写的配置更新回调函数类实例。 -->
+	<bean id="disconfMgrBean2" class="com.baidu.disconf.client.DisconfMgrBeanSecond"
+		init-method="init" destroy-method="destroy">
+	</bean>
+
+</beans>

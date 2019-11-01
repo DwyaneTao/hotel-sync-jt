@@ -1,0 +1,93 @@
+<configuration scan="true" scanPeriod="1 hours" debug="false">
+	<contextName>hotel-sync-jt-server</contextName>
+	<appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+		<!-- encoder 默认配置为PatternLayoutEncoder -->
+		<encoder>
+			<pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger - %msg%n
+			</pattern>
+		</encoder>
+	</appender>
+	<appender name="infoFILE"
+		class="ch.qos.logback.core.rolling.RollingFileAppender">
+		<rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+			<fileNamePattern>./logs/hotel/hotel-sync-jt-server/info.%d{yyyy-MM-dd}.%i.log</fileNamePattern>
+			<maxHistory>5</maxHistory>
+			<maxFileSize>50MB</maxFileSize>
+			<totalSizeCap>300MB</totalSizeCap> 
+		</rollingPolicy>
+		<filter class="ch.qos.logback.classic.filter.LevelFilter">
+			<level>INFO</level>
+			<onMatch>ACCEPT</onMatch>
+			<onMismatch>DENY</onMismatch>
+		</filter>
+		<encoder>
+			<pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger - %msg%n
+			</pattern>
+		</encoder>
+	</appender>
+	<appender name="errorFILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+		<rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+			<fileNamePattern>./logs/hotel/hotel-sync-jt-server/error.%d{yyyy-MM-dd}.%i.log</fileNamePattern>
+			<maxHistory>5</maxHistory>
+			<maxFileSize>50MB</maxFileSize>
+			<totalSizeCap>300MB</totalSizeCap> 
+		</rollingPolicy>
+		<filter class="ch.qos.logback.classic.filter.LevelFilter">
+			<level>ERROR</level>
+			<onMatch>ACCEPT</onMatch>
+			<onMismatch>DENY</onMismatch>
+		</filter>
+		<encoder>
+			<pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger - %msg%n
+			</pattern>
+		</encoder>
+	</appender>
+	<appender name="warnFILE"
+		class="ch.qos.logback.core.rolling.RollingFileAppender">
+		<file>./logs/hotel/hotel-sync-jt-server/warn.log</file>
+    	<rollingPolicy class="ch.qos.logback.core.rolling.FixedWindowRollingPolicy">
+      		<fileNamePattern>warn.log.%i</fileNamePattern>
+      		<minIndex>1</minIndex>
+      		<maxIndex>5</maxIndex>
+    	</rollingPolicy>
+
+   	 	<triggeringPolicy class="ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy">
+      		<maxFileSize>50MB</maxFileSize>
+    	</triggeringPolicy>
+		<filter class="ch.qos.logback.classic.filter.LevelFilter">
+			<level>WARN</level>
+			<onMatch>ACCEPT</onMatch>
+			<onMismatch>DENY</onMismatch>
+		</filter>
+		<encoder>
+			<pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger - %msg%n
+			</pattern>
+		</encoder>
+	</appender>
+	
+	<appender name="fatalFILE"
+		class="ch.qos.logback.core.rolling.RollingFileAppender">
+		<rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+			<fileNamePattern>./logs/hotel/hotel-sync-jt-server/fatal.%d{yyyy-MM-dd}.%i.log</fileNamePattern>
+			<maxHistory>5</maxHistory>
+			<maxFileSize>50MB</maxFileSize>
+			<totalSizeCap>300MB</totalSizeCap> 
+		</rollingPolicy>
+		<filter class="ch.qos.logback.classic.filter.LevelFilter">
+			<level>FATAL</level>
+			<onMatch>ACCEPT</onMatch>
+			<onMismatch>DENY</onMismatch>
+		</filter>
+		<encoder>
+			<pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger - %msg%n</pattern>
+		</encoder>
+	</appender>
+	
+	<root level="INFO">
+		<!--<appender-ref ref="STDOUT" />-->
+		<appender-ref ref="infoFILE" />
+		<appender-ref ref="errorFILE" />
+		<appender-ref ref="warnFILE" />
+		<appender-ref ref="fatalFILE" />
+	</root>
+</configuration>  

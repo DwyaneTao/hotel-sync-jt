@@ -1,0 +1,14 @@
+<component name="ArtifactManager">
+  <artifact type="war" name="hotel-sync-jt-server:war">
+    <output-path>$PROJECT_DIR$/hotel-sync-jt-server/target</output-path>
+    <properties id="maven-jee-properties">
+      <options>
+        <module>hotel-sync-jt-server</module>
+        <packaging>war</packaging>
+      </options>
+    </properties>
+    <root id="archive" name="hotel-sync-jt-server-1.0.0.war">
+      <element id="artifact" artifact-name="hotel-sync-jt-server:war exploded" />
+    </root>
+  </artifact>
+</component>

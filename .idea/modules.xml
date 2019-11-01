@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/hotel-sync-jt.iml" filepath="$PROJECT_DIR$/hotel-sync-jt.iml" />
+      <module fileurl="file://$PROJECT_DIR$/hotel-sync-jt-access/hotel-sync-jt-access.iml" filepath="$PROJECT_DIR$/hotel-sync-jt-access/hotel-sync-jt-access.iml" />
+      <module fileurl="file://$PROJECT_DIR$/hotel-sync-jt-server/hotel-sync-jt-server.iml" filepath="$PROJECT_DIR$/hotel-sync-jt-server/hotel-sync-jt-server.iml" />
+    </modules>
+  </component>
+</project>

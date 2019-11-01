@@ -1,0 +1,14 @@
+<jboss-deployment-structure xmlns="urn:jboss:deployment-structure:1.2">
+    <deployment>
+        <exclude-subsystems>
+            <subsystem name="jaxrs" />
+            <subsystem name="webservices" />
+            <subsystem name="logging" />
+        </exclude-subsystems>
+        <dependencies>
+            <module name="javax.xml.ws.api" export="true" />
+            <module name="javax.jws.api" export="true" />
+            <module name="org.apache.cxf.impl" export="true" />
+        </dependencies>
+    </deployment>
+</jboss-deployment-structure>

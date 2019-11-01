@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="
+        http://www.springframework.org/schema/beans 
+        http://www.springframework.org/schema/beans/spring-beans.xsd
+       "
+	default-autowire="byName" default-lazy-init="false">
+
+	<bean id="propertyPlaceholderConfigurer"
+		class="com.fangcang.hotel.sync.data.service.CustomPropertyConfigurer">
+		<property name="locations">
+			<list>
+				<value>classpath:remoteServer.properties</value>
+				<value>classpath:rocketmq.properties</value>
+			</list>
+		</property>
+	</bean>
+	
+	<!-- 公共 -->
+	<import resource="classpath:spring/applicationContext-common.xml" />
+	<import resource="classpath:spring/applicationContext-hessian.xml" />
+	<import resource="classpath:spring/applicationContext-rocketmq.xml" />
+	<import resource="classpath:spring/applicationContext-thread.xml" />
+	
+	<!-- 华住 -->
+	<import resource="classpath:spring/applicationContext-thread-jt.xml" />
+	<import resource="classpath:spring/applicationContext-aop.xml" />
+	<import resource="classpath:spring/applicationContext-config.xml" />
+	<import resource="classpath:spring/applicationContext-lts.xml" />
+	
+</beans>

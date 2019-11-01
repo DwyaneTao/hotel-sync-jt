@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+ 						http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop.xsd
+ 						http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd"
+	default-autowire="byName">
+
+	<!-- 公共切面：将组合后的产品原始数据存入redis -->
+	<!-- <bean id="baseResponseInRedisAspect"
+		class="com.fangcang.hotel.sync.data.aop.BaseResponseInRedisAop">
+		<property name="redisService" ref="redisService"></property>	
+	</bean>
+
+	<aop:config>
+		<aop:aspect id="baseResponseInRedisAop" ref="baseResponseInRedisAspect">
+			<aop:pointcut id="pointcutFetch"
+				expression="execution(public * com.fangcang.hotel.sync.common.base.SupplySyncService.*(..))" />
+			<aop:around method="around" pointcut-ref="pointcutFetch" />
+		</aop:aspect>
+	</aop:config> -->
+	
+	<!-- 深捷旅切面:存储访问深捷旅api的日志到ELK -->
+	<!-- <bean id="sjlAccessApiLogAspect" class="com.fangcang.hotel.sync.sjl.aop.SjlAccessApiLogAspect">
+		<property name="redisService" ref="redisService"></property>
+	</bean>
+	
+	<aop:config>
+		<aop:aspect id="sjlAccessApiLogAop" ref="sjlAccessApiLogAspect">
+			<aop:pointcut id="pointcutQuery" expression="execution(public * com.fangcang.hotel.sync.sjl.manager.SjlSyncManager.*(..))"/>
+			<aop:around method="aroundQuery" pointcut-ref="pointcutQuery"/>
+		</aop:aspect>
+	</aop:config> -->
+	
+	<aop:config proxy-target-class="true"></aop:config>
+</beans>
