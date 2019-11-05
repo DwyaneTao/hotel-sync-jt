@@ -57,7 +57,7 @@ public class OrderController {
 	 * @throws Exception
 	 */
 	@ResponseBody
-	@RequestMapping(value = "/init/jt/createOrder", produces = "text/html;charset=UTF-8")
+	@RequestMapping(value = "/init/jt/createOrder", produces = "application/json")
 	public CreateSupplyOrderResponse createFitReserve(HttpServletRequest request) throws Exception {
 		CreateSupplyOrderResponse createSupplyOrderResponse = new CreateSupplyOrderResponse();
 		InteractiveWithSaasLog interactiveWithSaasLog = new InteractiveWithSaasLog();
@@ -108,7 +108,7 @@ public class OrderController {
 	 * @throws Exception
 	 */
 	@ResponseBody
-	@RequestMapping(value = "/init/jt/cancelOrder", produces = "text/html;charset=UTF-8")
+	@RequestMapping(value = "/init/jt/cancelOrder", produces = "application/json")
 	public CancelOrderResponse cancelFitReserve(HttpServletRequest request) throws Exception {
 		CancelOrderResponse cancelOrderResponse = new CancelOrderResponse();
 		InteractiveWithSaasLog interactiveWithSaasLog = new InteractiveWithSaasLog();
@@ -183,7 +183,7 @@ public class OrderController {
 	 * @throws Exception
 	 */
 	@ResponseBody
-	@RequestMapping(value = "/init/jt/orderStatus", produces = "text/html;charset=UTF-8")
+	@RequestMapping(value = "/init/jt/orderStatus", produces = "application/json")
 	public QuerySupplyOrderResponse roomResourceList(HttpServletRequest request) throws Exception {
 		QuerySupplyOrderResponse querySupplyOrderResponse = new QuerySupplyOrderResponse();
 
