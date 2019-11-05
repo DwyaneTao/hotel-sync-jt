@@ -66,7 +66,7 @@ public class JTManagerImpl implements JTManager {
         String  url = JTConfig.getUrl() +JTConstants.createFitReserve;
         Map<String, String> headMap = getSignature();
         HttpResponse httpResponse = HttpClientUtil.doPost(url, JSON.toJSONString(request), headMap, JTConfig.getContenttype(),5000, 15000);
-        response = JSONObject.parseObject(httpResponse.getContent(), new TypeReference<Response<FitReserveResponse>>() {});
+        response = JSON.parseObject(httpResponse.getContent(), new TypeReference<Response<FitReserveResponse>>() {});
         return response;
     }
 
@@ -106,7 +106,7 @@ public class JTManagerImpl implements JTManager {
         String  url = JTConfig.getUrl() +JTConstants.singleTrialFitReserve;
         Map<String, String> headMap = getSignature();
         HttpResponse httpResponse = HttpClientUtil.doPost(url, JSON.toJSONString(request), headMap, JTConfig.getContenttype(),5000, 15000);
-        response = JSONObject.parseObject(httpResponse.getContent(), new TypeReference<Response<RoomResourceSingleTrialOutputResponse>>() {});
+        response = JSONObject.parseObject(httpResponse.getContent().replace("[","").replace("]",""), new TypeReference<Response<RoomResourceSingleTrialOutputResponse>>() {});
         return response;
     }
 

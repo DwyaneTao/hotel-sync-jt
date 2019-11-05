@@ -85,14 +85,16 @@ public class JTOrderServiceImpl implements SupplyOrderService {
         /**封装试预定请求参数模型**/
         SingleTrialFitReserveRequest reserveRequest = new SingleTrialFitReserveRequest();
         reserveRequest.setCardNo(pricePlanMappingDto.getGuestType());//会员卡号
-        reserveRequest.setChannelCode("");//渠道编码
+        reserveRequest.setChannelCode("hongsejl");//渠道编码
         reserveRequest.setComCardNo(preBookingRequest.getSupplyRateId());//推荐会员卡号
         reserveRequest.setStartDate(preBookingRequest.getCheckInDate());//起始日期
         reserveRequest.setEndDate(preBookingRequest.getCheckOutDate());//结束日期
-        reserveRequest.setRoomType(pricePlanMappingDto.getRoomName());//房型
+        String roomType = pricePlanMappingDto.getPricePlanName();
+        roomType.subSequence(roomType.indexOf("_")+1, roomType.length());
+        reserveRequest.setRoomType(roomType);//房型
         reserveRequest.setGroupCode("0003");//集团编号
         reserveRequest.setRoomQuantity(preBookingRequest.getRoomNum());//预订数量
-        reserveRequest.setHotelCode(preBookingRequest.getHotelId());//酒店编号
+        reserveRequest.setHotelCode(pricePlanMappingDto.getSpHotelId());//酒店编号
         reserveRequest.setId(0);//ID
         reserveRequest.setSupplyCode(supplyCode);
         Date preBookTime2 = new Date();

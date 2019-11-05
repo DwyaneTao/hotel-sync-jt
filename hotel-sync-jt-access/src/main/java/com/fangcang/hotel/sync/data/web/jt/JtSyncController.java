@@ -5,19 +5,19 @@ import com.fangcang.hotel.sync.common.api.dto.mapping.HotelMappingDto;
 import com.fangcang.hotel.sync.data.dto.MsgResponse;
 import com.fangcang.hotel.sync.data.service.SupplyFetchService;
 import com.fangcang.hotel.sync.data.util.StringUtilExtend;
-import com.fangcang.hotel.sync.jt.api.request.*;
+import com.fangcang.hotel.sync.jt.api.request.QueryHotelListRequest;
 import com.fangcang.hotel.sync.jt.config.JTConfig;
 import com.fangcang.hotel.sync.jt.dto.JTProductDataRequest;
 import com.fangcang.hotel.sync.jt.service.JTExtendsConfigService;
 import com.fangcang.hotel.sync.jt.service.JTHotelSyncService;
 import com.fangcang.hotel.sync.jt.service.impl.JTInitMappingService;
+import com.fangcang.hotel.sync.jt.service.impl.JTOrderServiceImpl;
 import com.fangcang.util.StringUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -40,7 +40,7 @@ public class JtSyncController {
     private JTExtendsConfigService jtExtendsConfigService;
 
     @Autowired
-    private JTOrderService jtOrderService;
+    private JTOrderServiceImpl jtOrderService;
 
 
     @Autowired
@@ -52,10 +52,11 @@ public class JtSyncController {
      */
     @ResponseBody
     @RequestMapping(value = "/init/jt/hotelList", produces = "text/html;charset=UTF-8")
-    public String initHotelList(@RequestBody QueryHotelListRequest requset) throws Exception {
+    public String initHotelList() throws Exception {
+        QueryHotelListRequest requset = new QueryHotelListRequest();
         MsgResponse msgResponse = new MsgResponse();
         requset.setSupplyClass("JT");
-        requset.setSupplyCode("JT");
+        requset.setSupplyCode("S10048011");
         requset.setCreater("system");
         requset.setIsCache2Redis(true);
         requset.setGroupCode(JTConfig.getGroupCode());
@@ -77,9 +78,6 @@ public class JtSyncController {
                 supplyCode = jtExtendsConfigService.getAllSupplyCode().iterator().next();
             }
             JTProductDataRequest jtProductDataRequest = new JTProductDataRequest();
-            jtProductDataRequest.setSupplyClass("JT");
-            jtProductDataRequest.setSupplyCode("JT");
-            jtProductDataRequest.setCreater("system");
             jtProductDataRequest.setIsCache2Redis(true);
             if (StringUtil.isValidString(coHotelIds) && !"all".equalsIgnoreCase(coHotelIds)) {
                 jtProductDataRequest.setSpHotelIds(Arrays.asList(coHotelIds.split("[,|，|\\s]")));

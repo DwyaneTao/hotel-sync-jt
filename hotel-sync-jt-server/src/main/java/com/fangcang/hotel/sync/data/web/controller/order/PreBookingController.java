@@ -37,6 +37,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.task.TaskExecutor;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.servlet.http.HttpServletRequest;
@@ -74,8 +75,8 @@ public class PreBookingController {
      * @throws Exception
      */
     @ResponseBody
-    @RequestMapping(value = "/init/jt/singleTrial", produces = "text/html;charset=UTF-8")
-    public PreBookingResponse singleTrialFitReserve(HttpServletRequest httpServletRequest) throws Exception {
+    @RequestMapping(value = "/pre/booking", method = RequestMethod.POST, produces = "application/json")
+    public PreBookingResponse proBooking(HttpServletRequest httpServletRequest) throws Exception {
         Date preBookStartTime = new Date();
         PreBookingResponse preBookingResponse = new PreBookingResponse();
         LogData logData = new LogData();

@@ -1,5 +1,7 @@
 package com.fangcang.hotel.sync.jt.dto;
 
+import com.fangcang.hotel.sync.jt.api.response.DayCmsRmPriceResponse;
+
 import java.util.List;
 
 public class JTProductDataDto {
@@ -8,6 +10,8 @@ public class JTProductDataDto {
     private String groupCode;
 
     private String hotelCode;
+
+    private String businessDate;
 
     private String roomType;
 
@@ -19,8 +23,7 @@ public class JTProductDataDto {
 
     private String oooQuantity;
 
-    private List<JTProductRoomDto> JTProductRoomDtos;
-
+    private List<DayCmsRmPriceResponse> JTProductRoomDtos;
 
     public String getGroupCode() {
         return groupCode;
@@ -36,6 +39,14 @@ public class JTProductDataDto {
 
     public void setHotelCode(String hotelCode) {
         this.hotelCode = hotelCode;
+    }
+
+    public String getBusinessDate() {
+        return businessDate;
+    }
+
+    public void setBusinessDate(String businessDate) {
+        this.businessDate = businessDate;
     }
 
     public String getRoomType() {
@@ -78,11 +89,11 @@ public class JTProductDataDto {
         this.oooQuantity = oooQuantity;
     }
 
-    public List<JTProductRoomDto> getJTProductRoomDtos() {
+    public List<DayCmsRmPriceResponse> getJTProductRoomDtos() {
         return JTProductRoomDtos;
     }
 
-    public void setJTProductRoomDtos(List<JTProductRoomDto> JTProductRoomDtos) {
+    public void setJTProductRoomDtos(List<DayCmsRmPriceResponse> JTProductRoomDtos) {
         this.JTProductRoomDtos = JTProductRoomDtos;
     }
 }

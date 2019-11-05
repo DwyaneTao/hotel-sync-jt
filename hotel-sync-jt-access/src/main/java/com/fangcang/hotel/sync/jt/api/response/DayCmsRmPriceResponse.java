@@ -1,10 +1,6 @@
 package com.fangcang.hotel.sync.jt.api.response;
 
-/**
- * 房价返回参数
- * @author py
- * @date 2019/10/23 19:57
- **/
+
 public class DayCmsRmPriceResponse extends BusinessResponse {
 
     /**
@@ -71,6 +67,37 @@ public class DayCmsRmPriceResponse extends BusinessResponse {
      * 备注
      */
     private String remarks;
+
+    /**
+     * 早餐等
+     */
+    private String breakfast1;
+
+    private String breakfast2;
+
+    private String breakfast3;
+
+    private String breakfast4;
+
+    private String breakfastN;
+
+    /**
+     * ticket
+     */
+    private String tickets1;
+
+    private String tickets2;
+
+    private String tickets3;
+
+    private String tickets4;
+
+    /**
+     *
+     */
+    private String packeagesList;
+
+    private String priceRemarks;
 
     /**
      * 自增ID号
@@ -194,6 +221,94 @@ public class DayCmsRmPriceResponse extends BusinessResponse {
 
     public void setRemarks(String remarks) {
         this.remarks = remarks;
+    }
+
+    public String getBreakfast1() {
+        return breakfast1;
+    }
+
+    public void setBreakfast1(String breakfast1) {
+        this.breakfast1 = breakfast1;
+    }
+
+    public String getBreakfast2() {
+        return breakfast2;
+    }
+
+    public void setBreakfast2(String breakfast2) {
+        this.breakfast2 = breakfast2;
+    }
+
+    public String getBreakfast3() {
+        return breakfast3;
+    }
+
+    public void setBreakfast3(String breakfast3) {
+        this.breakfast3 = breakfast3;
+    }
+
+    public String getBreakfast4() {
+        return breakfast4;
+    }
+
+    public void setBreakfast4(String breakfast4) {
+        this.breakfast4 = breakfast4;
+    }
+
+    public String getBreakfastN() {
+        return breakfastN;
+    }
+
+    public void setBreakfastN(String breakfastN) {
+        this.breakfastN = breakfastN;
+    }
+
+    public String getTickets1() {
+        return tickets1;
+    }
+
+    public void setTickets1(String tickets1) {
+        this.tickets1 = tickets1;
+    }
+
+    public String getTickets2() {
+        return tickets2;
+    }
+
+    public void setTickets2(String tickets2) {
+        this.tickets2 = tickets2;
+    }
+
+    public String getTickets3() {
+        return tickets3;
+    }
+
+    public void setTickets3(String tickets3) {
+        this.tickets3 = tickets3;
+    }
+
+    public String getTickets4() {
+        return tickets4;
+    }
+
+    public void setTickets4(String tickets4) {
+        this.tickets4 = tickets4;
+    }
+
+    public String getPackeagesList() {
+        return packeagesList;
+    }
+
+    public void setPackeagesList(String packeagesList) {
+        this.packeagesList = packeagesList;
+    }
+
+    public String getPriceRemarks() {
+        return priceRemarks;
+    }
+
+    public void setPriceRemarks(String priceRemarks) {
+        this.priceRemarks = priceRemarks;
     }
 
     public Integer getId() {

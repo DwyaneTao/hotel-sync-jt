@@ -3,7 +3,6 @@ package com.fangcang.hotel.sync.data.web;
 import com.fangcang.hotel.sync.common.api.dto.mapping.HotelMappingDto;
 import com.fangcang.hotel.sync.common.api.dto.mapping.PricePlanMappingDto;
 import com.fangcang.hotel.sync.common.api.dto.mapping.RoomMappingDto;
-import com.fangcang.hotel.sync.data.constants.SupplierClass;
 import com.fangcang.hotel.sync.data.service.CacheService;
 import com.fangcang.hotel.sync.data.util.StringUtilExtend;
 import com.fangcang.hotel.sync.jt.service.impl.JTCacheService;
