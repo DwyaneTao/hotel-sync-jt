@@ -267,6 +267,7 @@ public class JTOrderServiceImpl implements SupplyOrderService {
 
         Response<FitReserveResponse> orderResponse = null;
         try {
+            //
             orderResponse = jtManager.createFitReserve(request);
             response.setResponseContent(JSON.toJSONString(orderResponse));
         }catch (Exception e){
