@@ -212,62 +212,28 @@ public class JTOrderServiceImpl implements SupplyOrderService {
         List<SupplyGuestDTO> guestList = hotelSupplyOrderDTO.getSupplyGuests();
         for (SupplyGuestDTO guestDTO : guestList){
             request.setName(guestDTO.getGuestName());//入住人
-            request.setReservePhone(guestDTO.getPhone());//手机
+            request.setReservePhone("13548585658");//手机 guestDTO.getPhone()
         }
+        request.setChannelCode("hongsejl");
         request.setRoomQuantity(String.valueOf(hotelSupplyOrderDTO.getRoomNum()));//预定总房数
-        request.setRoomType(hotelSupplyOrderDTO.getRoomTypeName());//房类
-        List<SupplyDetailsDTO> detailsDTOList = hotelSupplyOrderDTO.getSupplyDetails();
-        String priceCheck = null;
-        String roomIndex = null;
-        for (SupplyDetailsDTO detailsDTO : detailsDTOList){
-            priceCheck = detailsDTO.getPriceCheck();
-            roomIndex = detailsDTO.getRoomIndex();
-            request.setRoomRate(priceCheck);//门市价
-            request.setRateCode(roomIndex);//房价码
-
-        }
-        request.setPayAmount(hotelSupplyOrderDTO.getOrderSum());//支付金额
+        request.setRoomType("BDKS");//房类
+        request.setRateCode("VIP1");//房价码
         request.setActualRate(hotelSupplyOrderDTO.getOrderSum().toString());//成交价
-        request.setCouponsAmount(new BigDecimal(10));//优惠金额（可选择的）
-        request.setChannelCode("hongsejl");//渠道编码
-        request.setHoldDate("");//保留时间（可选择的）
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-        Date checkInDate = hotelSupplyOrderDTO.getCheckInDate();
-        Date checkOutDate = hotelSupplyOrderDTO.getCheckOutDate();
-        long noofDays = (checkInDate.getTime()-checkOutDate.getTime())/(24*60*60*1000);
-        request.setNoofDays(String.valueOf(noofDays));//入住天数（可选择的）
-        request.setArrivalDate(sdf.format(hotelSupplyOrderDTO.getCheckInDate()));//入住日
-        request.setDepartureDate(sdf.format(hotelSupplyOrderDTO.getCheckOutDate()));//离开日
-        request.setStatus(String.valueOf(hotelSupplyOrderDTO.getPayState()) );//状态  支付状态（可选择的）
-        request.setRemarks(createOrderRequest.getRemark());//备注（可选择的）
-        request.setCreateUser(hotelSupplyOrderDTO.getCreateName());//创建人
-        request.setCreateDate(hotelSupplyOrderDTO.getCreateTime().toString());//创建时间（可选择的）
-        request.setSalesId("");//工号（可选择的）
-        request.setTotalPrice(hotelSupplyOrderDTO.getOrderSum());//订单总金额 （可选择的）
-        request.setSupplyCode(supplyCode);
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        request.setArrivalDate("2019-11-09 12:42:00");//入住日  sdf.format(hotelSupplyOrderDTO.getCheckInDate())
+        request.setDepartureDate("2019-11-10 19:20:00");//离开日  sdf.format(hotelSupplyOrderDTO.getCheckOutDate())
         ResRoomResourcePriceInputModel priceInputModel = new ResRoomResourcePriceInputModel();
-//        priceInputModel.setSerial(null);//中央订单号 （可选择的）
-//        priceInputModel.setAccountNo(null);//酒店订单号（可选择的）
-        priceInputModel.setBusinessDate(null);//营业日期
-        priceInputModel.setRoomType(hotelSupplyOrderDTO.getRoomTypeName());//房类
-        priceInputModel.setRateCode(roomIndex);//房价码
-//        priceInputModel.setRoomRate(new BigDecimal(priceCheck));//门市价
-        priceInputModel.setActualRateText("￥" + hotelSupplyOrderDTO.getOrderSum());
+        SimpleDateFormat sdfs = new SimpleDateFormat("yyyy-MM-dd");
+        priceInputModel.setBusinessDate("2019-11-09");//sdfs.format(hotelSupplyOrderDTO.getCheckInDate())
+        priceInputModel.setRateCode("VIP1");//房价码 roomIndex
         priceInputModel.setActualRate(hotelSupplyOrderDTO.getOrderSum());//成交价
-//        priceInputModel.setCouponsAmount(null);//优惠金额（可选择的）
-//        priceInputModel.setReasion(null);//变价理由（可选择的）
-//        priceInputModel.setRemarks(null);//备注（可选择的）
-        priceInputModel.setRoomPrice(hotelSupplyOrderDTO.getOrderSum());
-        priceInputModel.setGroupCode("0003");//集团编号
-        priceInputModel.setHotelCode(pricePlanMappingDto.getSpHotelId());//酒店编号
-        priceInputModel.setUserName(sjlExtendConfig.getContactName());//操作人
-        List<ResRoomResourcePriceInputModel> priceInputModels = new ArrayList<>();
+        List<ResRoomResourcePriceInputModel> priceInputModels = new ArrayList<ResRoomResourcePriceInputModel>();
         priceInputModels.add(priceInputModel);
-        request.setDayPriceList(priceInputModels);//每日房价列表：一日一房价 （可选择的）
-
+        request.setDayPriceList(priceInputModels);//每日房价列表：一日一房价
+        request.setGroupCode("0003");
+        request.setHotelCode(pricePlanMappingDto.getSpHotelId());
         Response<FitReserveResponse> orderResponse = null;
         try {
-            //
             orderResponse = jtManager.createFitReserve(request);
             response.setResponseContent(JSON.toJSONString(orderResponse));
         }catch (Exception e){
@@ -283,6 +249,13 @@ public class JTOrderServiceImpl implements SupplyOrderService {
         if(orderResponse != null && orderResponse.getData() != null
                 && orderResponse.getCode() == Integer.valueOf(JTResponseEnum.SUCCESS.key)){
             orderResponse.setMessage("创建君庭订单成功");
+            response.setSupplierFailMessage(orderResponse.getMessage());
+            response.setSupplierOrderCode(orderResponse.getData().getParentReserveNo());
+            response.setReturnDesc(orderResponse.getMessage());
+            response.setSupplierOrderStatus(orderResponse.getCode());
+           if (orderResponse.getSuccess()){
+               fillResult(response, FCReturnNoEnum._010000000);
+           }
         }else{
             log.error("创建君庭订单单失败，没有找到商家配置！supplyCode:" + createOrderRequest +",merchantCode:"
                     + createOrderRequest.getMerchantCode());
@@ -316,13 +289,12 @@ public class JTOrderServiceImpl implements SupplyOrderService {
         }
         orderResult.setSupplierOrderCode(supplyOrderCode);
         CancelFitReserveRequest reserveRequest = new CancelFitReserveRequest();
-
-        if (StringUtil. isValidString(supplyOrderDto.getSupplierOrderCode())){
+        if (StringUtil.isValidString(supplyOrderDto.getSupplierOrderCode())){
             reserveRequest.setSerial(supplyOrderDto.getSupplierOrderCode());//
         }
-        if(StringUtil.isValidString(supplyOrderDto.getSupplyOrderCode())){
-            reserveRequest.setUnionSerial(supplyOrderDto.getSupplyOrderCode());//
-        }
+//        if(StringUtil.isValidString(supplyOrderDto.getSupplyOrderCode())){
+//            reserveRequest.setUnionSerial(supplyOrderDto.getSupplyOrderCode());//
+//        }
         reserveRequest.setSupplyCode(supplyCode);
         reserveRequest.setGroupCode("0003");//集团编号
         reserveRequest.setHotelCode(supplyOrderDto.getSpHotelId());//酒店编号
@@ -347,10 +319,12 @@ public class JTOrderServiceImpl implements SupplyOrderService {
         if(null == orderResponse){
             fillResult(orderResult, FCReturnNoEnum._010603082);
         }else{
-            if(orderResponse.getData() != null && orderResponse.getSuccess() != null
-                    &&  Integer.valueOf(JTResponseEnum.SUCCESS.key).equals(orderResponse.getSuccess())){
+            if(orderResponse != null &&  Integer.valueOf(JTResponseEnum.SUCCESS.key).equals(orderResponse.getCode())){
                 orderResult.setSupplyResult(SupplyResultEnum.CANCEL.result);
-                fillResult(orderResult, FCReturnNoEnum._010000000);
+                if (orderResponse.getSuccess()){
+                    orderResult.setReturnDesc("订单取消成功");
+                    fillResult(orderResult, FCReturnNoEnum._010000000);
+                }
             }else{
                 String Message = orderResponse.getMessage();
                 orderResult.setSupplierFailMessage(Message);

@@ -154,7 +154,8 @@ public class OrderController {
 			interactiveWithSaasLog.setSupplyClass(supplyOrderDto.getSupplyClass());
 
 			cancelOrderResponse = commonOrderService.cancelOrder(cancelOrderRequest,supplyOrderDto);
-
+			cancelOrderResponse.setReason(cancelOrderRequest.getCacelReason());
+			cancelOrderResponse.setSupplyOrderCode(supplyOrderDto.getSupplyOrderCode());
 			interactiveWithSaasLog.setResult(InteractiveResult.SUCCESS.result);
 			interactiveWithSaasLog.setResponseContent(JSON.toJSONString(cancelOrderResponse));
 			if(FCReturnNoEnum._010000000.returnNo.equals(cancelOrderResponse.getReturnNo())){

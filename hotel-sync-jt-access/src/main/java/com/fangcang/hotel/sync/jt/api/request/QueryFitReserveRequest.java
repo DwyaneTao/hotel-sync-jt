@@ -153,6 +153,16 @@ public class QueryFitReserveRequest extends BusinessRequest{
      */
     private List<ResRoomResourcePriceInputModel> dayPriceList;
 
+    /**
+     * 集团编号
+     */
+    private String groupCode;
+
+    /**
+     * 酒店编号
+     */
+    private String hotelCode;
+
     public BigDecimal getPayAmount() {
         return payAmount;
     }
@@ -385,4 +395,19 @@ public class QueryFitReserveRequest extends BusinessRequest{
         this.status = status;
     }
 
+    public String getGroupCode() {
+        return groupCode;
+    }
+
+    public void setGroupCode(String groupCode) {
+        this.groupCode = groupCode;
+    }
+
+    public String getHotelCode() {
+        return hotelCode;
+    }
+
+    public void setHotelCode(String hotelCode) {
+        this.hotelCode = hotelCode;
+    }
 }
