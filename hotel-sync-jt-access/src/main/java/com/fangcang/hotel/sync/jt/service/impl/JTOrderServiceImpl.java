@@ -18,6 +18,7 @@ import com.fangcang.hotel.sync.jt.api.response.FitReserveResponse;
 import com.fangcang.hotel.sync.jt.api.response.ResRoomResourceLiteOutputResponse;
 import com.fangcang.hotel.sync.jt.api.response.Response;
 import com.fangcang.hotel.sync.jt.api.response.RoomResourceSingleTrialOutputResponse;
+import com.fangcang.hotel.sync.jt.config.JTConfig;
 import com.fangcang.hotel.sync.jt.config.JTExtendConfig;
 import com.fangcang.hotel.sync.jt.constants.JTResponseEnum;
 import com.fangcang.hotel.sync.jt.manager.JTManager;
@@ -91,14 +92,14 @@ public class JTOrderServiceImpl implements SupplyOrderService {
         /**封装试预定请求参数模型**/
         SingleTrialFitReserveRequest reserveRequest = new SingleTrialFitReserveRequest();
         reserveRequest.setCardNo(pricePlanMappingDto.getGuestType());//会员卡号
-        reserveRequest.setChannelCode("hongsejl");//渠道编码
+        reserveRequest.setChannelCode(JTConfig.getChannelCode());//渠道编码
         reserveRequest.setComCardNo(preBookingRequest.getSupplyRateId());//推荐会员卡号
         reserveRequest.setStartDate(preBookingRequest.getCheckInDate());//起始日期
         reserveRequest.setEndDate(preBookingRequest.getCheckOutDate());//结束日期
         String roomType = pricePlanMappingDto.getPricePlanName();
         roomType.subSequence(roomType.indexOf("_")+1, roomType.length());
         reserveRequest.setRoomType(roomType);//房型
-        reserveRequest.setGroupCode("0003");//集团编号
+        reserveRequest.setGroupCode(JTConfig.getGroupCode());//集团编号
         reserveRequest.setRoomQuantity(preBookingRequest.getRoomNum());//预订数量
         reserveRequest.setHotelCode(pricePlanMappingDto.getSpHotelId());//酒店编号
         reserveRequest.setId(0);//ID
@@ -214,7 +215,7 @@ public class JTOrderServiceImpl implements SupplyOrderService {
             request.setName(guestDTO.getGuestName());//入住人
             request.setReservePhone("13548585658");//手机 guestDTO.getPhone()
         }
-        request.setChannelCode("hongsejl");
+        request.setChannelCode(JTConfig.getChannelCode());
         request.setRoomQuantity(String.valueOf(hotelSupplyOrderDTO.getRoomNum()));//预定总房数
         request.setRoomType("BDKS");//房类
         request.setRateCode("VIP1");//房价码
@@ -230,7 +231,7 @@ public class JTOrderServiceImpl implements SupplyOrderService {
         List<ResRoomResourcePriceInputModel> priceInputModels = new ArrayList<ResRoomResourcePriceInputModel>();
         priceInputModels.add(priceInputModel);
         request.setDayPriceList(priceInputModels);//每日房价列表：一日一房价
-        request.setGroupCode("0003");
+        request.setGroupCode(JTConfig.getGroupCode());
         request.setHotelCode(pricePlanMappingDto.getSpHotelId());
         Response<FitReserveResponse> orderResponse = null;
         try {
@@ -296,7 +297,7 @@ public class JTOrderServiceImpl implements SupplyOrderService {
 //            reserveRequest.setUnionSerial(supplyOrderDto.getSupplyOrderCode());//
 //        }
         reserveRequest.setSupplyCode(supplyCode);
-        reserveRequest.setGroupCode("0003");//集团编号
+        reserveRequest.setGroupCode(JTConfig.getGroupCode());//集团编号
         reserveRequest.setHotelCode(supplyOrderDto.getSpHotelId());//酒店编号
         reserveRequest.setModifyDate(new Date().toString());//修改时间
         reserveRequest.setModifyUser("xhy");//修改人
@@ -361,7 +362,7 @@ public class JTOrderServiceImpl implements SupplyOrderService {
         if(StringUtil. isValidString(supplyOrderDto.getSupplierOrderCode())){
             request.setParentReserveNo(supplyOrderDto.getSupplierOrderCode());
         }
-        request.setGroupCode("0003");
+        request.setGroupCode(JTConfig.getGroupCode());
         request.setHotelCode(supplyOrderDto.getSpHotelId());
         request.setSupplyCode(supplyCode);
 
