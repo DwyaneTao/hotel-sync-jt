@@ -19,7 +19,7 @@ public interface JTManager {
 
     Response<ResRoomResourceLiteOutputResponse> batchRoomResourceList(RoomResourceListRequest requset) throws Exception;
 
-    Response<RoomResourceSingleTrialOutputResponse> singleTrialFitReserve(SingleTrialFitReserveRequest requset) throws Exception;
+    Response<RoomResourceSingleTrialListResponse> singleTrialFitReserve(SingleTrialFitReserveRequest requset) throws Exception;
 
     Response prepayFitReserve(PrepayFitReserveRequest requset) throws Exception;
 

@@ -5,7 +5,7 @@ package com.fangcang.hotel.sync.jt.api.response;
  * @author py
  * @date 2019/10/23 18:33
  **/
-public class RoomResourceSingleTrialOutputResponse extends BusinessResponse {
+public class RoomResourceSingleTrialOutputResponse {
 
     /**
      * 房类

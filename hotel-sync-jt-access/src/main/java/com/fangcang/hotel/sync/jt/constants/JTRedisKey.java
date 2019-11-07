@@ -15,4 +15,10 @@ public class JTRedisKey {
 
     /**酒店-价格计划的映射*/
     public static final String JT_HOTEL_PRICEPLAN_MAPPING = Constants.SP_Redis_Key_Prefiex + "JT_HOTEL_PRICE_PLAN_MAPPING";
+
+
+    /** 深捷旅酒店基本信息 */
+    public static final String HOTEL_MAPPING_KEY = Constants.SP_Redis_Key_Prefiex + "HOTEL_MAPPING_JT";
+
+
 }

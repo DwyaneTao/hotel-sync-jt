@@ -90,7 +90,6 @@ public class JTDataConverter implements SupplyDataConverter {
 						roomType.setSpHotelId(hotelDetail.getHotelInfo().getHotelCode());
 						roomType.setSpRoomName(type.getDescription());
 						roomType.setSpBedType(JTUtil.getClassifyBedType(type.getDescription()));
-						roomType.setBedTypeName(type.getDescription());
 						roomType.setIsActive(ActiveEnum.ACTIVE.getValue());
 						roomType.setStatus(1);
 						roomType.setSupplyClass("JT");
@@ -115,65 +114,66 @@ public class JTDataConverter implements SupplyDataConverter {
 		BaseSyncInRedisDto baseSyncInRedisDto = JSON.parseObject(data, BaseSyncInRedisDto.class);
 		JTProductDataRequest baseRequest = JSON.parseObject(baseSyncInRedisDto.getRequestString(), JTProductDataRequest.class);
 
-		JTProductDto baseResponse = JSON.parseObject(baseSyncInRedisDto.getResponseString(),new TypeReference<JTProductDto>(){});
+		List<JTProductDto> baseResponse = JSON.parseObject(baseSyncInRedisDto.getResponseString(),new TypeReference<List<JTProductDto>>(){});
 		if(null == baseResponse){
 			log.error("君亭转换产品数据处理失败,源数据为空!"+data);
 			return productMiddleDtos;
 		}
-        String hotelMappingCacheKey = StringUtilExtend.uniteString(CacheKeyConstant.ROOM_MAPPING, "JT");
-		List<JTProductDataDto> jtProductDtos = baseResponse.getJtProductDtos();
+		if ( null != baseResponse && !baseResponse.isEmpty()) {
 
-		for (JTProductDataDto jtProductDto : jtProductDtos) {
+			for (JTProductDto jtProductDto : baseResponse) {
+				List<JTProductDataDto> jtProductDtos = jtProductDto.getJtProductDtos();
 
-			ProductMiddleDto productMiddleDto = new ProductMiddleDto();
-			productMiddleDto.setPricePlanName(jtProductDto.getRoomType());
-            productMiddleDto.setSpPricePlanId(jtProductDto.getHotelCode()+"_"+jtProductDto.getRoomType());
-            productMiddleDto.setSpHotelId(jtProductDto.getHotelCode());
-            productMiddleDto.setSpRoomTypeId(jtProductDto.getHotelCode()+"_"+jtProductDto.getRoomType());
-            productMiddleDto.setCurrency(CurrencyEnum.CNY.key);
-            productMiddleDto.setPayMethod(2);
-            productMiddleDto.setBedType("1000000");
-            productMiddleDto.setGuestType(1);//所有客人
-            productMiddleDto.setSupplyClass("JT");//class
-            productMiddleDto.setSupplyCode("S10048011");//code
-            productMiddleDto.setCreator("system");
-            productMiddleDto.setModifier("system");
-//            productMiddleDto.setSpRoomName("四季商务房");
-//            productMiddleDto.setSpHotelName("杭州西溪谷测试酒店");
-//            productMiddleDto.setSpRoomName(jtProductDto.getRoomType());
-//            productMiddleDto.setSpPricePlanId(jtProductDto.getHotelCode()+"_"+jtProductDto.getRoomType());
-//            productMiddleDto.setTotalAmount(Double.valueOf(jtProductDto.getTotalQuantity()));
-//            productMiddleDto.setSupplyClassName("君亭");
-//            productMiddleDto.setBroadBand(3);
+				for (JTProductDataDto jtProductDataDto : jtProductDtos) {
 
-            List<DayCmsRmPriceResponse> jtProductRoomDtos = jtProductDto.getJTProductRoomDtos();
-			List<ProductDetailMiddleDto> productDetails = new ArrayList();
-            List<ProductDeclare> productDeclares = new LinkedList<>();
-            for (DayCmsRmPriceResponse jtProductRoomDto : jtProductRoomDtos) {
+					ProductMiddleDto productMiddleDto = new ProductMiddleDto();
+					productMiddleDto.setPricePlanName(jtProductDataDto.getRoomType());
+					productMiddleDto.setSpPricePlanId(jtProductDataDto.getHotelCode()+"_"+jtProductDataDto.getRoomType());
+					productMiddleDto.setSpHotelId(jtProductDataDto.getHotelCode());
+					productMiddleDto.setSpRoomTypeId(jtProductDataDto.getHotelCode()+"_"+jtProductDataDto.getRoomType());
+					productMiddleDto.setCurrency(CurrencyEnum.CNY.key);
+					productMiddleDto.setPayMethod(2);
+					productMiddleDto.setBedType("1000000");
+					productMiddleDto.setGuestType(1);//所有客人
+					productMiddleDto.setSupplyClass("JT");//class
+					productMiddleDto.setSupplyCode("S10048011");//code
+					productMiddleDto.setCreator("system");
+					productMiddleDto.setModifier("system");
 
-                ProductDetailMiddleDto productDetailMiddleDto = new ProductDetailMiddleDto();
-                productDetailMiddleDto.setSaleDate(jtProductRoomDto.getBusinessDate().substring(0,10));//底价时间
-                productDetailMiddleDto.setBasePrice(Double.valueOf(jtProductRoomDto.getRoomRate()));//底价
-                productDetailMiddleDto.setBreakfastType(BreakFastEnum.getEnumByKey(jtProductRoomDto.getPackeagesQuantity()).fcCode);
-                productDetailMiddleDto.setBreakfastNum(BreakFastEnum.getEnumByKey(jtProductRoomDto.getPackeagesQuantity()).fcCode);
-                Integer totalQuantity = jtProductDto.getTotalQuantity() == null ? 0 : Integer.valueOf(jtProductDto.getTotalQuantity());
-                Integer currentQuantity = jtProductDto.getCurrentQuantity() == null ? 0 : Integer.valueOf(jtProductDto.getCurrentQuantity());
-                if ( currentQuantity == 0) {
-                    productDetailMiddleDto.setQuotaState(RoomStateEnum.FULL_ROOM.key);//配额类型
-                } else if ( totalQuantity - currentQuantity > 0 ) {
-                    productDetailMiddleDto.setQuotaState(RoomStateEnum.HAVA_ROOM.key);
-                }
-                productDetailMiddleDto.setQuotaNum(currentQuantity);//配额
-                productDetailMiddleDto.setOverDraft(0);
-                productDetailMiddleDto.setOverdraftNum(-1);
+					List<DayCmsRmPriceResponse> jtProductRoomDtos = jtProductDataDto.getJTProductRoomDtos();
+					List<ProductDetailMiddleDto> productDetails = new ArrayList();
+					List<ProductDeclare> productDeclares = new LinkedList<>();
+					for (DayCmsRmPriceResponse jtProductRoomDto : jtProductRoomDtos) {
+
+						ProductDetailMiddleDto productDetailMiddleDto = new ProductDetailMiddleDto();
+						productDetailMiddleDto.setSaleDate(jtProductRoomDto.getBusinessDate().substring(0,10));//底价时间
+						productDetailMiddleDto.setBasePrice(Double.valueOf(jtProductRoomDto.getRoomRate()));//底价
+						productDetailMiddleDto.setBreakfastType(BreakFastEnum.getEnumByKey(jtProductRoomDto.getPackeagesQuantity()).fcCode);
+						productDetailMiddleDto.setBreakfastNum(BreakFastEnum.getEnumByKey(jtProductRoomDto.getPackeagesQuantity()).fcCode);
+						Integer totalQuantity = jtProductDataDto.getTotalQuantity() == null ? 0 : Integer.valueOf(jtProductDataDto.getTotalQuantity());
+						Integer currentQuantity = jtProductDataDto.getCurrentQuantity() == null ? 0 : Integer.valueOf(jtProductDataDto.getCurrentQuantity());
+						if ( currentQuantity == 0) {
+							productDetailMiddleDto.setQuotaState(RoomStateEnum.FULL_ROOM.key);//配额类型
+						} else if ( totalQuantity - currentQuantity > 0 ) {
+							productDetailMiddleDto.setQuotaState(RoomStateEnum.HAVA_ROOM.key);
+						}
+						productDetailMiddleDto.setQuotaNum(currentQuantity);//配额
+						productDetailMiddleDto.setOverDraft(0);
+						productDetailMiddleDto.setOverdraftNum(-1);
 //条款
-                productDetailMiddleDto.setBookRestrictType(1);
-                productDetails.add(productDetailMiddleDto);
-            }
-            productMiddleDto.getProductDetails().addAll(productDetails);
-			productMiddleDtos.add(productMiddleDto);
+						productDetailMiddleDto.setBookRestrictType(1);
+						productDetails.add(productDetailMiddleDto);
+					}
+					productMiddleDto.getProductDetails().addAll(productDetails);
+					productMiddleDtos.add(productMiddleDto);
+
+				}
+
+			}
 
 		}
+
+
 		return productMiddleDtos;
 	}
 

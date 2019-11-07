@@ -27,10 +27,6 @@ public class JTManagerImpl implements JTManager {
 
     private Log log = LogFactory.getLog(JTManagerImpl.class);
 
-    @Autowired
-    private JTExtendsConfigService jtExtendsConfigService;
-
-
     /**
      *酒店基础信息
      */
@@ -92,7 +88,7 @@ public class JTManagerImpl implements JTManager {
         String  url = JTConfig.getUrl() +JTConstants.getBatchRoomResourceList;
         Map<String, String> headMap = getSignature();
         HttpResponse httpResponse = HttpClientUtil.doPost(url, JSON.toJSONString(request), headMap, JTConfig.getContenttype(),5000, 15000);
-        response = JSONObject.parseObject(httpResponse.getContent(), new TypeReference<Response<ResRoomResourceLiteOutputResponse>>() {});
+        response = JSONObject.parseObject(httpResponse.getContent().replace("[","").replace("]",""), new TypeReference<Response<ResRoomResourceLiteOutputResponse>>() {});
         return response;
     }
 
@@ -101,13 +97,18 @@ public class JTManagerImpl implements JTManager {
      * 预订试单
      */
     @Override
-    public Response<RoomResourceSingleTrialOutputResponse> singleTrialFitReserve(SingleTrialFitReserveRequest request) throws Exception {
-        Response<RoomResourceSingleTrialOutputResponse> response = null;
+    public Response<RoomResourceSingleTrialListResponse> singleTrialFitReserve(SingleTrialFitReserveRequest request) throws Exception {
+        Response<RoomResourceSingleTrialListResponse> response = null;
         String  url = JTConfig.getUrl() +JTConstants.singleTrialFitReserve;
         Map<String, String> headMap = getSignature();
         HttpResponse httpResponse = HttpClientUtil.doPost(url, JSON.toJSONString(request), headMap, JTConfig.getContenttype(),5000, 15000);
-        response = JSONObject.parseObject(httpResponse.getContent().replace("[","").replace("]",""), new TypeReference<Response<RoomResourceSingleTrialOutputResponse>>() {});
-        return response;
+        if ( httpResponse.getContent().contains("\"Data\":null")) {
+            return null;
+        } else {
+            response = JSONObject.parseObject(httpResponse.getContent().replace("\"Data\":[", "\"Data\":{\"roomResourceSingleTrialOutputResponses\": [") + "}", new TypeReference<Response<RoomResourceSingleTrialListResponse>>() {
+            });
+            return response;
+        }
     }
 
 
@@ -133,8 +134,13 @@ public class JTManagerImpl implements JTManager {
         String  url = JTConfig.getUrl() +JTConstants.getRoomStockList;
         Map<String, String> headMap = getSignature();
         HttpResponse httpResponse = HttpClientUtil.doPost(url, JSON.toJSONString(request), headMap, JTConfig.getContenttype(),5000, 15000);
-        response = JSONObject.parseObject(httpResponse.getContent().replace("\"Data\":[","\"Data\":{\"resRoomStockOutputResponses\": [")+"}", new TypeReference<Response<ResRoomStockOutputListResponse>>() {});
-        return response;
+//        Response response1 = JSONObject.parseObject(httpResponse.getContent(), new TypeReference<Response>() {});
+        if ( httpResponse.getContent().contains("\"Data\":null")) {
+            return null;
+        } else {
+            response = JSONObject.parseObject(httpResponse.getContent().replace("\"Data\":[","\"Data\":{\"resRoomStockOutputResponses\": [")+"}", new TypeReference<Response<ResRoomStockOutputListResponse>>() {});
+            return response;
+        }
     }
 
     /**
@@ -194,7 +200,6 @@ public class JTManagerImpl implements JTManager {
          * 生成token
          */
         String  token = data.getAccessToken();
-
         /**
          * 获取签名
          */

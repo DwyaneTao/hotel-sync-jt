@@ -2,45 +2,35 @@ package com.fangcang.hotel.sync.jt.service.impl;
 
 import com.alibaba.fastjson.JSON;
 import com.fangcang.enums.CurrencyEnum;
-import com.fangcang.enums.ReturnCodeEnum;
 import com.fangcang.enums.RoomStateEnum;
-import com.fangcang.enums.returncode.ErrorCodeEnum;
 import com.fangcang.enums.returncode.FCReturnNoEnum;
-import com.fangcang.finance.exception.ErrorCode;
-import com.fangcang.hotel.sync.common.api.constant.OrderOperateEnum;
 import com.fangcang.hotel.sync.common.api.dto.mapping.PricePlanMappingDto;
 import com.fangcang.hotel.sync.common.api.dto.order.SupplyOrderDto;
 import com.fangcang.hotel.sync.data.dto.PreBookingResult;
 import com.fangcang.hotel.sync.data.dto.SupplierOrderResult;
 import com.fangcang.hotel.sync.data.service.SupplyOrderService;
 import com.fangcang.hotel.sync.jt.api.request.*;
-import com.fangcang.hotel.sync.jt.api.response.FitReserveResponse;
-import com.fangcang.hotel.sync.jt.api.response.ResRoomResourceLiteOutputResponse;
-import com.fangcang.hotel.sync.jt.api.response.Response;
-import com.fangcang.hotel.sync.jt.api.response.RoomResourceSingleTrialOutputResponse;
+import com.fangcang.hotel.sync.jt.api.response.*;
 import com.fangcang.hotel.sync.jt.config.JTConfig;
 import com.fangcang.hotel.sync.jt.config.JTExtendConfig;
 import com.fangcang.hotel.sync.jt.constants.JTResponseEnum;
+import com.fangcang.hotel.sync.jt.constants.OrderResponseEnum;
 import com.fangcang.hotel.sync.jt.manager.JTManager;
 import com.fangcang.hotel.sync.jt.service.JTExtendsConfigService;
 import com.fangcang.hotel.sync.order.constants.CanBookEnum;
 import com.fangcang.hotel.sync.order.constants.SupplyResultEnum;
 import com.fangcang.hotel.sync.order.dto.HotelSupplyOrderDTO;
-import com.fangcang.hotel.sync.order.dto.SupplyDetailsDTO;
 import com.fangcang.hotel.sync.order.dto.SupplyGuestDTO;
 import com.fangcang.hotel.sync.order.dto.request.CreateSupplyOrderRequest;
 import com.fangcang.hotel.sync.order.dto.request.PreBookingRequest;
 import com.fangcang.hotel.sync.order.dto.request.PriceInfoDetail;
 import com.fangcang.util.DateUtil;
 import com.fangcang.util.StringUtil;
-import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
@@ -106,7 +96,7 @@ public class JTOrderServiceImpl implements SupplyOrderService {
         reserveRequest.setSupplyCode(supplyCode);
         Date preBookTime2 = new Date();
 
-        Response<RoomResourceSingleTrialOutputResponse> response = null;
+        Response<RoomResourceSingleTrialListResponse> response = null;
         try {
             response = jtManager.singleTrialFitReserve(reserveRequest);
         }catch (Exception e ){
@@ -127,53 +117,56 @@ public class JTOrderServiceImpl implements SupplyOrderService {
 
 //        /** 获取试预定查询天数 */
 //        Set<String> preDays = getQueryDays(DateUtil.stringToDate(checkInDate), DateUtil.stringToDate(checkOutDate));
-
         // 试预定详情
-        List<PriceInfoDetail> priceInfoDetails = new ArrayList<PriceInfoDetail>();
-        if(response != null && response.getData() != null){
-            PriceInfoDetail priceInfoDetail = new PriceInfoDetail();
-            priceInfoDetail.setCurrency(CurrencyEnum.CNY.key);
-            priceInfoDetail.setQuotaNum(response.getData().getCurrentQuantity());
-            priceInfoDetail.setDate(response.getData().getBusinessDate());
-            //若是返回的天数与查询的天数相同
-            String businessDate = response.getData().getBusinessDate();
-            businessDate.subSequence(0,10);
-            if (response.getData().getCurrentQuantity() == 0) {
-                bookResult.setCanBook(CanBookEnum.CAN_NOT_BOOK.value);
-//            bookResult.setCanImmediate(canImmediate);
-                bookResult.setReturnNo(FCReturnNoEnum._010601001.returnNo);
-                bookResult.setReturnCode(FCReturnNoEnum._010601001.returnCode);
-                bookResult.setReturnDesc(FCReturnNoEnum._010601001.returnDesc + "，调用试预定接口成功，但在" + businessDate + "等日期满房");
-                priceInfoDetail.setDate(businessDate);
-                priceInfoDetail.setCurrency(CurrencyEnum.CNY.key);
-                priceInfoDetail.setQuotaNum(0);
-                priceInfoDetail.setPrice(0D);
-                priceInfoDetail.setCanbook(CanBookEnum.CAN_NOT_BOOK.value);
-                priceInfoDetail.setNeedQuery(0);
-                priceInfoDetail.setRoomStatus(RoomStateEnum.FULL_ROOM.key);
-                priceInfoDetail.setCanOverDraft(0);
-                priceInfoDetails.add(priceInfoDetail);
-            }else{
-                bookResult.setCanBook(CanBookEnum.CAN_BOOK.value);
-//            bookResult.setCanImmediate(canImmediate);
-                bookResult.setReturnNo(FCReturnNoEnum._010000000.returnNo);
-                bookResult.setReturnCode(FCReturnNoEnum._010000000.returnCode);
-                bookResult.setReturnDesc(FCReturnNoEnum._010000000.returnDesc);
-                priceInfoDetail.setDate(businessDate);
-                priceInfoDetail.setCurrency(CurrencyEnum.CNY.key);
-                priceInfoDetail.setQuotaNum(0);
-                priceInfoDetail.setPrice(0D);
-                priceInfoDetail.setCanbook(CanBookEnum.CAN_BOOK.value);
-                priceInfoDetail.setNeedQuery(0);
-                priceInfoDetail.setRoomStatus(RoomStateEnum.HAVA_ROOM.key);
-                priceInfoDetail.setCanOverDraft(0);
-                priceInfoDetails.add(priceInfoDetail);
-            }
-            bookResult.setPreBookingResponseDetails(priceInfoDetails);
+        //TODO 返回为多天 注释内容需要调整
+        List<RoomResourceSingleTrialOutputResponse> roomResourceSingleTrialOutputResponses = response.getData().getRoomResourceSingleTrialOutputResponses();
 
-        }else {
-            log.error("君庭试单验证失败，返回失败结果.");
-        }
+//
+//
+//        List<PriceInfoDetail> priceInfoDetails = new ArrayList<PriceInfoDetail>();
+//        if(response != null && response.getData() != null){
+//            PriceInfoDetail priceInfoDetail = new PriceInfoDetail();
+//            priceInfoDetail.setCurrency(CurrencyEnum.CNY.key);
+//            priceInfoDetail.setQuotaNum(response.getData().getCurrentQuantity());
+//            priceInfoDetail.setDate(response.getData().getBusinessDate());
+//            //若是返回的天数与查询的天数相同
+//            String businessDate = response.getData().getBusinessDate();
+//            businessDate.subSequence(0,10);
+//            if (response.getData().getCurrentQuantity() == 0) {
+//                bookResult.setCanBook(CanBookEnum.CAN_NOT_BOOK.value);
+////            bookResult.setCanImmediate(canImmediate);
+//                bookResult.setReturnNo(FCReturnNoEnum._010601001.returnNo);
+//                bookResult.setReturnCode(FCReturnNoEnum._010601001.returnCode);
+//                bookResult.setReturnDesc(FCReturnNoEnum._010601001.returnDesc + "，调用试预定接口成功，但在" + businessDate + "等日期满房");
+//                priceInfoDetail.setDate(businessDate);
+//                priceInfoDetail.setCurrency(CurrencyEnum.CNY.key);
+//                priceInfoDetail.setQuotaNum(0);
+//                priceInfoDetail.setPrice(0D);
+//                priceInfoDetail.setCanbook(CanBookEnum.CAN_NOT_BOOK.value);
+//                priceInfoDetail.setNeedQuery(0);
+//                priceInfoDetail.setRoomStatus(RoomStateEnum.FULL_ROOM.key);
+//                priceInfoDetail.setCanOverDraft(0);
+//                priceInfoDetails.add(priceInfoDetail);
+//            }else{
+//                bookResult.setCanBook(CanBookEnum.CAN_BOOK.value);
+////            bookResult.setCanImmediate(canImmediate);
+//                bookResult.setReturnNo(FCReturnNoEnum._010000000.returnNo);
+//                bookResult.setReturnCode(FCReturnNoEnum._010000000.returnCode);
+//                bookResult.setReturnDesc(FCReturnNoEnum._010000000.returnDesc);
+//                priceInfoDetail.setDate(businessDate);
+//                priceInfoDetail.setCurrency(CurrencyEnum.CNY.key);
+//                priceInfoDetail.setQuotaNum(0);
+//                priceInfoDetail.setPrice(0D);
+//                priceInfoDetail.setCanbook(CanBookEnum.CAN_BOOK.value);
+//                priceInfoDetail.setNeedQuery(0);
+//                priceInfoDetail.setRoomStatus(RoomStateEnum.HAVA_ROOM.key);
+//                priceInfoDetail.setCanOverDraft(0);
+//                priceInfoDetails.add(priceInfoDetail);
+//            }
+//            bookResult.setPreBookingResponseDetails(priceInfoDetails);
+//        }else {
+//            log.error("君庭试单验证失败，返回失败结果.");
+//        }
         bookResult.setSupplyCode(supplyCode);
         bookResult.setHotelId(preBookingRequest.getHotelId());
         bookResult.setRoomId(preBookingRequest.getRoomId());
@@ -248,7 +241,7 @@ public class JTOrderServiceImpl implements SupplyOrderService {
             response.setRequestContent(JSON.toJSONString(request));
         }
         if(orderResponse != null && orderResponse.getData() != null
-                && orderResponse.getCode() == Integer.valueOf(JTResponseEnum.SUCCESS.key)){
+                && orderResponse.getCode() == JTResponseEnum.SUCCESS.key){
             orderResponse.setMessage("创建君庭订单成功");
             response.setSupplierFailMessage(orderResponse.getMessage());
             response.setSupplierOrderCode(orderResponse.getData().getParentReserveNo());
@@ -362,14 +355,15 @@ public class JTOrderServiceImpl implements SupplyOrderService {
         if(StringUtil. isValidString(supplyOrderDto.getSupplierOrderCode())){
             request.setParentReserveNo(supplyOrderDto.getSupplierOrderCode());
         }
-        request.setGroupCode(JTConfig.getGroupCode());
+        request.setGroupCode("0003");
         request.setHotelCode(supplyOrderDto.getSpHotelId());
         request.setSupplyCode(supplyCode);
 
-        Response<ResRoomResourceLiteOutputResponse> orderResponse = new Response<ResRoomResourceLiteOutputResponse>();
+        Response<ResRoomResourceLiteOutputResponse> orderResponse = null;
         try {
             orderResponse = jtManager.batchRoomResourceList(request);
-            orderResult.setResponseContent(JSON.toJSONString(orderResponse));
+            orderResult.setSupplierResponseCode(orderResponse.getCode().toString());
+            orderResult.setResponseContent(JSON.toJSONString(orderResponse.getData()));
         }catch (Exception e){
             log.error("君亭查询订单失败，系统异常.supplyCode:"+supplyCode+",merchantCode:"+merchantCode+
                     ",supplyOrderCode:"+supplyOrderCode+",e is" ,e);
@@ -380,28 +374,47 @@ public class JTOrderServiceImpl implements SupplyOrderService {
             orderResult.setRequestContent(JSON.toJSONString(request));
         }
 
-//
-//                String status = orderResponse.getData().gethStatus();
-//                switch (status) {
-//                    case "1": //待确认
-//                        orderResult.setSupplyResult(OrderEnum.WILLSURE.value);
-//                        orderResult.setSupplierOrderStatus(Integer.parseInt(OrderResponseEnum.WILLSURE.key));
-//                        break;
-//                    case "2": //已确认
-//                        orderResult.setSupplyResult(OrderResponseEnum.BESURE.value);
-//                        orderResult.setSupplierOrderStatus(Integer.parseInt(OrderResponseEnum.BESURE.key));
-//                        break;
-//                    case "3"://已拒单
-//                        orderResult.setSupplyResult(OrderResponseEnum.REFUSE.value);
-//                        orderResult.setSupplierOrderStatus(Integer.parseInt(OrderResponseEnum.REFUSE.key));
-//                        break;
-//                    default://已取消
-//                        orderResult.setSupplyResult(OrderResponseEnum.CANCEL.value);
-//                        orderResult.setSupplierOrderStatus(Integer.parseInt(OrderResponseEnum.CANCEL.key));
-//                        break;
+        if(null == orderResponse){
+            fillResult(orderResult, FCReturnNoEnum._010604082);
+            return orderResult;
+        }else {
+            if(orderResponse.getData() != null &&  Integer.valueOf(JTResponseEnum.SUCCESS.key).equals(orderResponse.getCode())){
+//                for (RoomResourceSingleTrialOutputResponse roomResourceSingleTrialOutputRespons : orderResponse.getData().getRoomResourceSingleTrialOutputResponses()) {
+//                    String  status = orderResponse.getData().getStatus();
+//                    switch (status) {
+//                        case "R": //预订
+//                            orderResult.setSupplyResult(OrderResponseEnum.WILLSURE.value);
+//                            orderResult.setSupplierOrderStatus(Integer.parseInt(OrderResponseEnum.WILLSURE.key));
+//                            break;
+//                        case "I": //已确认
+//                            orderResult.setSupplyResult(OrderResponseEnum.BESURE.value);
+//                            orderResult.setSupplierOrderStatus(Integer.parseInt(OrderResponseEnum.BESURE.key));
+//                            break;
+//                        case "O": //结账
+//                            orderResult.setSupplyResult(OrderResponseEnum.BESURE.value);
+//                            orderResult.setSupplierOrderStatus(Integer.parseInt(OrderResponseEnum.BESURE.key));
+//                            break;
+//                        case "S": //离店挂账
+//                            orderResult.setSupplyResult(OrderResponseEnum.BESURE.value);
+//                            orderResult.setSupplierOrderStatus(Integer.parseInt(OrderResponseEnum.BESURE.key));
+//                            break;
+//                        case "C"://取消
+//                            orderResult.setSupplyResult(OrderResponseEnum.REFUSE.value);
+//                            orderResult.setSupplierOrderStatus(Integer.parseInt(OrderResponseEnum.CANCEL.key));
+//                            break;
+//                    }
 //                }
-//            }
-//        }
+
+                orderResult.setSupplierOrderCode(supplyOrderDto.getSupplierOrderCode());
+                fillResult(orderResult, FCReturnNoEnum._010000000);
+            }else{
+                String errorMsg = orderResponse.getCode().toString();
+                log.error("查询深捷旅订单失败，订单不成功.supplyCode:"+supplyCode+",merchantCode:"+merchantCode+
+                        ",supplyOrderCode:"+supplyOrderCode+",errorMsg :"+ errorMsg);
+                orderResult.setSupplierFailMessage(errorMsg);
+                fillResult(orderResult, FCReturnNoEnum._010604052);
+            }
+        }
         return orderResult;
     }
 

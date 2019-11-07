@@ -25,6 +25,16 @@ public class JTConfig {
 
     private static String channelCode;
 
+    private static String rateCode;
+
+    @DisconfFileItem(name = "jt.rateCode")
+    public static String getRateCode() {
+        return rateCode;
+    }
+
+    public static void setRateCode(String rateCode) {
+        JTConfig.rateCode = rateCode;
+    }
 
     @DisconfFileItem(name = "jt.channelCode")
     public static String getChannelCode() {

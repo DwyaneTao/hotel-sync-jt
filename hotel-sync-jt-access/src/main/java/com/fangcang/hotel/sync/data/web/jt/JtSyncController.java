@@ -71,19 +71,12 @@ public class JtSyncController {
 
     @RequestMapping(value = "/sync/jt/product", produces = "application/json")
     @ResponseBody
-    public MsgResponse syncSJLProduct(@RequestParam(value = "coHotelIds", required = true) String coHotelIds, @RequestParam(value = "supplyCode", required = false) String supplyCode) {
+    public MsgResponse syncSJLProduct() {
         MsgResponse response = new MsgResponse();
         try {
-            if (StringUtils.isBlank(supplyCode)) {
-                supplyCode = jtExtendsConfigService.getAllSupplyCode().iterator().next();
-            }
             JTProductDataRequest jtProductDataRequest = new JTProductDataRequest();
             jtProductDataRequest.setIsCache2Redis(true);
-            if (StringUtil.isValidString(coHotelIds) && !"all".equalsIgnoreCase(coHotelIds)) {
-                jtProductDataRequest.setSpHotelIds(Arrays.asList(coHotelIds.split("[,|，|\\s]")));
-            }
             jtFetchService.fetchHotelProductInfo(jtProductDataRequest);
-
             response.setCode(1);
             response.setMsg("SUCCESS");
         } catch (Exception e) {

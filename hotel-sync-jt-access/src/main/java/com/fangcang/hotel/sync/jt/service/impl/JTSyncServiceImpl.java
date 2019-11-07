@@ -3,6 +3,7 @@ package com.fangcang.hotel.sync.jt.service.impl;
 import com.alibaba.fastjson.JSON;
 import com.fangcang.hotel.sync.data.annotations.SyncPlugin;
 import com.fangcang.hotel.sync.data.dto.BaseSyncRequest;
+import com.fangcang.hotel.sync.data.service.RedisService;
 import com.fangcang.hotel.sync.data.service.SupplySyncService;
 import com.fangcang.hotel.sync.jt.api.request.DailyRoomPriceListRequest;
 import com.fangcang.hotel.sync.jt.api.request.QueryHotelListRequest;
@@ -14,6 +15,7 @@ import com.fangcang.hotel.sync.jt.api.response.hotel.HotelDetail;
 import com.fangcang.hotel.sync.jt.api.response.hotel.HotelInfo;
 import com.fangcang.hotel.sync.jt.api.response.hotel.RoomType;
 import com.fangcang.hotel.sync.jt.config.JTConfig;
+import com.fangcang.hotel.sync.jt.constants.JTRedisKey;
 import com.fangcang.hotel.sync.jt.dto.*;
 import com.fangcang.hotel.sync.jt.manager.JTManager;
 import com.sun.org.apache.bcel.internal.generic.NEW;
@@ -22,8 +24,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.LinkedList;
-import java.util.List;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 @Service("jtSyncService")
 @SyncPlugin(supplierClass = "JT")
@@ -33,6 +35,9 @@ public class JTSyncServiceImpl implements SupplySyncService {
 
     @Autowired
     private JTManager jtManager;
+
+    @Autowired
+    private RedisService redisService;
 
     @Override
     public String queryHotelBasicInfo(BaseSyncRequest baseSyncRequest) throws Exception {
@@ -93,49 +98,67 @@ public class JTSyncServiceImpl implements SupplySyncService {
         String responseJson = null;
         JTProductDataRequest request = (JTProductDataRequest) baseSyncRequest;
 
-        QueryHotelListRequest queryHotelListRequest = new QueryHotelListRequest();
-        queryHotelListRequest.setSupplyCode(request.getSupplyCode());
+        Date date = new Date();
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
+        String now = simpleDateFormat.format(date);
+        Calendar cal = Calendar.getInstance();
+        cal.add(Calendar.DATE, 60);
+        Date endDate = cal.getTime();
+        String endTime = simpleDateFormat.format(endDate);
 
-        RoomStockListRequest roomStockListRequest = new RoomStockListRequest();
-        roomStockListRequest.setChannelCode(JTConfig.getChannelCode());
-        roomStockListRequest.setGroupCode(JTConfig.getGroupCode());
-        roomStockListRequest.setHotelCode("J571005");
-        roomStockListRequest.setStartDate("2019-11-05");
-        roomStockListRequest.setEndDate("2019-11-05");
+        List<JTProductDto> list = new LinkedList<>();
+        Set<String> hotelCodes = redisService.hgetall(JTRedisKey.HOTEL_MAPPING_KEY).keySet();
+        for (String hotelCode : hotelCodes) {
+            JTProductDto jtProductDto = new JTProductDto();
+            QueryHotelListRequest queryHotelListRequest = new QueryHotelListRequest();
+            queryHotelListRequest.setSupplyCode(request.getSupplyCode());
 
-        DailyRoomPriceListRequest dailyRoomPriceListRequest = new DailyRoomPriceListRequest();
-        dailyRoomPriceListRequest.setChannelCode(JTConfig.getChannelCode());
-        dailyRoomPriceListRequest.setRateCode("VIP1");
-        dailyRoomPriceListRequest.setGroupCode(JTConfig.getGroupCode());
-        dailyRoomPriceListRequest.setHotelCode("J571005");
+            RoomStockListRequest roomStockListRequest = new RoomStockListRequest();
+            roomStockListRequest.setChannelCode(JTConfig.getChannelCode());
+            roomStockListRequest.setGroupCode(JTConfig.getGroupCode());
+            roomStockListRequest.setHotelCode(hotelCode);
+            roomStockListRequest.setStartDate(now);
+            roomStockListRequest.setEndDate(endTime);
 
-        Response<ResRoomStockOutputListResponse> roomStockList = jtManager.getRoomStockList(roomStockListRequest);
+            DailyRoomPriceListRequest dailyRoomPriceListRequest = new DailyRoomPriceListRequest();
+            dailyRoomPriceListRequest.setChannelCode(JTConfig.getChannelCode());
+            dailyRoomPriceListRequest.setRateCode("VIP1");
+            dailyRoomPriceListRequest.setGroupCode(JTConfig.getGroupCode());
+            dailyRoomPriceListRequest.setHotelCode(hotelCode);
+            dailyRoomPriceListRequest.setStartDate(now);
+            dailyRoomPriceListRequest.setEndDate(endTime);
 
-        JTProductDto jtProductDto = new JTProductDto();
-        List<JTProductDataDto> jtProductDataDtoList = new LinkedList<>();
-        for (ResRoomStockOutputResponse resRoomStockOutputRespons : roomStockList.getData().getResRoomStockOutputResponses()) {
+            Response<ResRoomStockOutputListResponse> roomStockList = jtManager.getRoomStockList(roomStockListRequest);
+            if ( null != roomStockList) {
+                List<JTProductDataDto> jtProductDataDtoList = new LinkedList<>();
+                for (ResRoomStockOutputResponse resRoomStockOutputRespons : roomStockList.getData().getResRoomStockOutputResponses()) {
 
-            JTProductDataDto jtProductDataDto = new JTProductDataDto();
-            jtProductDataDto.setGroupCode(JTConfig.getGroupCode());
-            jtProductDataDto.setHotelCode(resRoomStockOutputRespons.getHotelCode());
-            jtProductDataDto.setBusinessDate(resRoomStockOutputRespons.getBusinessDate());
-            jtProductDataDto.setRoomType(resRoomStockOutputRespons.getRoomType());
-            jtProductDataDto.setTotalQuantity(resRoomStockOutputRespons.getTotalQuantity().toString());//房间总数
-            jtProductDataDto.setCurrentQuantity(resRoomStockOutputRespons.getCurrentQuantity().toString());//当前可用数
-            jtProductDataDto.setTodayDepartureQuantity(resRoomStockOutputRespons.getTodayDepartureQuantity().toString());//本日将离数
-            jtProductDataDto.setOooQuantity(resRoomStockOutputRespons.getOooQuantity().toString());//维修房的房数
+                    JTProductDataDto jtProductDataDto = new JTProductDataDto();
+                    jtProductDataDto.setGroupCode(JTConfig.getGroupCode());
+                    jtProductDataDto.setHotelCode(resRoomStockOutputRespons.getHotelCode());
+                    jtProductDataDto.setBusinessDate(resRoomStockOutputRespons.getBusinessDate());
+                    jtProductDataDto.setRoomType(resRoomStockOutputRespons.getRoomType());
+                    jtProductDataDto.setTotalQuantity(resRoomStockOutputRespons.getTotalQuantity().toString());//房间总数
+                    jtProductDataDto.setCurrentQuantity(resRoomStockOutputRespons.getCurrentQuantity().toString());//当前可用数
+                    jtProductDataDto.setTodayDepartureQuantity(resRoomStockOutputRespons.getTodayDepartureQuantity().toString());//本日将离数
+                    jtProductDataDto.setOooQuantity(resRoomStockOutputRespons.getOooQuantity().toString());//维修房的房数
 
-            List<DayCmsRmPriceResponse> dayCmsRmPriceResponses = null;
-            dailyRoomPriceListRequest.setRoomType(resRoomStockOutputRespons.getRoomType());
-            Response<DayCmsRmPriceListResponse> dailyRoomPriceList = jtManager.getDailyRoomPriceList(dailyRoomPriceListRequest);
-            if ( null != dailyRoomPriceList.getData() && !dailyRoomPriceList.getData().getDayCmsRmPriceResponses().isEmpty() ) {
-                dayCmsRmPriceResponses = dailyRoomPriceList.getData().getDayCmsRmPriceResponses();
-                jtProductDataDto.setJTProductRoomDtos(dayCmsRmPriceResponses);
+                    List<DayCmsRmPriceResponse> dayCmsRmPriceResponses = null;
+                    dailyRoomPriceListRequest.setRoomType(resRoomStockOutputRespons.getRoomType());
+                    dailyRoomPriceListRequest.setStartDate(resRoomStockOutputRespons.getBusinessDate().substring(0,10));
+                    dailyRoomPriceListRequest.setEndDate(resRoomStockOutputRespons.getBusinessDate().substring(0,10));
+                    Response<DayCmsRmPriceListResponse> dailyRoomPriceList = jtManager.getDailyRoomPriceList(dailyRoomPriceListRequest);
+                    if ( null != dailyRoomPriceList.getData() && !dailyRoomPriceList.getData().getDayCmsRmPriceResponses().isEmpty() ) {
+                        dayCmsRmPriceResponses = dailyRoomPriceList.getData().getDayCmsRmPriceResponses();
+                        jtProductDataDto.setJTProductRoomDtos(dayCmsRmPriceResponses);
+                    }
+                    jtProductDataDtoList.add(jtProductDataDto);
+                }
+                jtProductDto.setJtProductDtos(jtProductDataDtoList);
+                list.add(jtProductDto);
             }
-            jtProductDataDtoList.add(jtProductDataDto);
         }
-        jtProductDto.setJtProductDtos(jtProductDataDtoList);
         request.setRequestJson(JSON.toJSONString(request));
-        return JSON.toJSONString(jtProductDto);
+        return JSON.toJSONString(list);
     }
 }
