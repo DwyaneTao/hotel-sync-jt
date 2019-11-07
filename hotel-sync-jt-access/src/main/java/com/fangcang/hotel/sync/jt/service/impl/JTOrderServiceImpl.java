@@ -20,6 +20,7 @@ import com.fangcang.hotel.sync.jt.service.JTExtendsConfigService;
 import com.fangcang.hotel.sync.order.constants.CanBookEnum;
 import com.fangcang.hotel.sync.order.constants.SupplyResultEnum;
 import com.fangcang.hotel.sync.order.dto.HotelSupplyOrderDTO;
+import com.fangcang.hotel.sync.order.dto.SupplyDetailsDTO;
 import com.fangcang.hotel.sync.order.dto.SupplyGuestDTO;
 import com.fangcang.hotel.sync.order.dto.request.CreateSupplyOrderRequest;
 import com.fangcang.hotel.sync.order.dto.request.PreBookingRequest;
@@ -120,9 +121,6 @@ public class JTOrderServiceImpl implements SupplyOrderService {
         // 试预定详情
         //TODO 返回为多天 注释内容需要调整
         List<RoomResourceSingleTrialOutputResponse> roomResourceSingleTrialOutputResponses = response.getData().getRoomResourceSingleTrialOutputResponses();
-
-//
-//
 //        List<PriceInfoDetail> priceInfoDetails = new ArrayList<PriceInfoDetail>();
 //        if(response != null && response.getData() != null){
 //            PriceInfoDetail priceInfoDetail = new PriceInfoDetail();
@@ -213,16 +211,19 @@ public class JTOrderServiceImpl implements SupplyOrderService {
         request.setRoomType("BDKS");//房类
         request.setRateCode("VIP1");//房价码
         request.setActualRate(hotelSupplyOrderDTO.getOrderSum().toString());//成交价
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-        request.setArrivalDate("2019-11-09 12:42:00");//入住日  sdf.format(hotelSupplyOrderDTO.getCheckInDate())
-        request.setDepartureDate("2019-11-10 19:20:00");//离开日  sdf.format(hotelSupplyOrderDTO.getCheckOutDate())
-        ResRoomResourcePriceInputModel priceInputModel = new ResRoomResourcePriceInputModel();
-        SimpleDateFormat sdfs = new SimpleDateFormat("yyyy-MM-dd");
-        priceInputModel.setBusinessDate("2019-11-09");//sdfs.format(hotelSupplyOrderDTO.getCheckInDate())
-        priceInputModel.setRateCode("VIP1");//房价码 roomIndex
-        priceInputModel.setActualRate(hotelSupplyOrderDTO.getOrderSum());//成交价
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+        request.setArrivalDate(sdf.format(hotelSupplyOrderDTO.getCheckInDate()) + "06:00:00");//入住日
+        request.setDepartureDate(sdf.format(hotelSupplyOrderDTO.getCheckOutDate()) + "12:00:00");//离开日  sdf.format(hotelSupplyOrderDTO.getCheckOutDate())
+        //获取每日房价信息
+        List<SupplyDetailsDTO> supplyDetailsDTOList = hotelSupplyOrderDTO.getSupplyDetails();
         List<ResRoomResourcePriceInputModel> priceInputModels = new ArrayList<ResRoomResourcePriceInputModel>();
-        priceInputModels.add(priceInputModel);
+        for (SupplyDetailsDTO priceInputModelDto :supplyDetailsDTOList){
+            ResRoomResourcePriceInputModel priceInputModel = new ResRoomResourcePriceInputModel();
+            priceInputModel.setBusinessDate(sdf.format(priceInputModelDto.getRoomDate()));//营业时间
+            priceInputModel.setRateCode("VIP1");//房价码
+            priceInputModel.setActualRate(priceInputModelDto.getRoomPrice());//每日房价
+            priceInputModels.add(priceInputModel);
+        }
         request.setDayPriceList(priceInputModels);//每日房价列表：一日一房价
         request.setGroupCode(JTConfig.getGroupCode());
         request.setHotelCode(pricePlanMappingDto.getSpHotelId());
@@ -292,9 +293,9 @@ public class JTOrderServiceImpl implements SupplyOrderService {
         reserveRequest.setSupplyCode(supplyCode);
         reserveRequest.setGroupCode(JTConfig.getGroupCode());//集团编号
         reserveRequest.setHotelCode(supplyOrderDto.getSpHotelId());//酒店编号
-        reserveRequest.setModifyDate(new Date().toString());//修改时间
-        reserveRequest.setModifyUser("xhy");//修改人
-        reserveRequest.setUserName("xhy");//操作人
+//        reserveRequest.setModifyDate(new Date().toString());//修改时间
+//        reserveRequest.setModifyUser("xhy");//修改人
+//        reserveRequest.setUserName("xhy");//操作人
 
         Response orderResponse = new Response();
         try{
